@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script defer src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script defer src="script.js"></script>
+    <style>
+      textarea {
+        width: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <p>your uid is</p>
+      <p id="uid"><%= uid %></p>
+    </ul>
+
+    <form id="send-container" action="/input" method="post">
+      <label for="message-input">enter the queries here</label> <br /><br />
+      <textarea rows="5" name="query" id="input-query"></textarea>
+      <button id="textSubmit" type="submit">submit</button>
+    </form>
+
+    <br /><br /><br />
+    <p>upload files</p>
+    <input id="queryFile" type="file" multiple />
+    <br />
+    <button id="fileSubmit" type="submit">submit your file</button>
+
+    <br /><br /><br />
+    <form action="/logout?_method=DELETE" method="post">
+      <button type="submit" class="logout">logout</button>
+    </form>
+  </body>
+</html>
