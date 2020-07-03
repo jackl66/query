@@ -7,33 +7,174 @@
     <script defer src="http://localhost:5000/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script defer src="script.js"></script>
-    <style>
-      textarea {
-        width: 800px;
-      }
-    </style>
+    <link rel="Stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Raleway"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
   </head>
   <body>
-    <ul>
-      <p>your uid is</p>
-      <p id="uid"><%= uid %></p>
-    </ul>
+    <!-- Top container -->
+    <div class="w3-bar w3-top w3-black w3-large" style="z-index: 4;">
+      <button
+        class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey"
+        onclick="w3_open();"
+      >
+        <i class="fa fa-bars"></i> Menu
+      </button>
+      <span class="w3-bar-item w3-right"
+        ><img src="/pics/LogoWhite.png" style="width: 90px;" />&nbsp Cheetah
+        Data Systems, Inc.</span
+      >
+    </div>
+    <!-- Top container -->
 
-    <form id="send-container" action="/input" method="post">
-      <label for="message-input">enter the queries here</label> <br /><br />
-      <textarea rows="5" name="query" id="input-query"></textarea>
-      <button id="textSubmit" type="submit">submit</button>
-    </form>
+    <!-- dashboard and sidebar -->
+    <div id="left-container">
+      <nav
+        class="w3-sidebar w3-collapse w3-white w3-animate-left"
+        style="z-index: 3; width: 300px;"
+        id="mySidebar"
+      >
+        <br />
+        <div class="w3-container w3-row">
+          <div class="w3-col s4">
+            <img src="/pics/database.png" style="width: 90px;" />
+          </div>
+          <div class="w3-col s8 w3-bar">
+            <span>Welcome to <strong>CheetahDB</strong></span
+            ><br />
+            <a href="/MNexit" class="w3-bar-item w3-button"
+              ><i class="fa fa-chevron-left"></i
+            ></a>
+            <a href="MNOverview" class="w3-bar-item w3-button"
+              ><i class="fa fa-user"></i
+            ></a>
+            <a href="#" class="w3-bar-item w3-button"
+              ><i class="fa fa-home"></i
+            ></a>
+          </div>
+        </div>
 
-    <br /><br /><br />
-    <p>upload files</p>
-    <input id="queryFile" type="file" multiple />
-    <br />
-    <button id="fileSubmit" type="submit">submit your file</button>
+        <hr />
+        <div class="w3-container">
+          <h5>Dashboard</h5>
+        </div>
+        <div class="w3-bar-block">
+          <a
+            href="#"
+            class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
+            onclick="w3_close()"
+            title="close menu"
+            ><i class="fa fa-remove fa-fw"></i> Close Menu</a
+          >
+          <a href="MNOverview" class="w3-bar-item w3-button w3-padding"
+            ><i class="fa fa-info-circle"></i> Overview</a
+          >
+          <a href="MNTable" class="w3-bar-item w3-button w3-padding"
+            ><i class="fa fa-table"></i> Tables</a
+          >
+          <a href="MNVis" class="w3-bar-item w3-button w3-padding"
+            ><i class="fa fa-bar-chart"></i> Visualization</a
+          >
+          <a href="MNQuery" class="w3-bar-item w3-button w3-padding"
+            ><i class="fa fa-search"></i> SQL Client</a
+          >
+          <a href="MNSDH" class="w3-bar-item w3-button w3-padding"
+            ><i class="fa fa-play fa-fw"></i> SDH Demo</a
+          >
+          <a href="SQLA" class="w3-bar-item w3-button w3-padding w3-blue"
+            ><i class="fa fa-rocket fa-fw"></i> SQL Accelerator</a
+          >
+        </div>
+      </nav>
+    </div>
+    <!-- dashboard and sidebar -->
 
-    <br /><br /><br />
-    <form action="/logout?_method=DELETE" method="post">
-      <button type="submit" class="logout">logout</button>
-    </form>
+    <!-- input area: text or file upload -->
+    <div id="right-container">
+      <h3>Welcome to CheetahSQLA! User</h3>
+      <h3 id="uid"><%= uid %></h3>
+      <br /><br />
+
+      <!-- textarea for text input  -->
+      <form id="send-container" action="/input" method="post">
+        <label for="message-input">Enter the queries here</label> <br /><br />
+        <textarea rows="5" name="query" id="input-query"></textarea>
+        <br />
+        <button id="textSubmit" type="submit" data-modal-target="#modal">
+          submit
+        </button>
+      </form>
+      <!-- textarea for text input  -->
+
+      <!-- a modal to inform the user he has submitted something -->
+      <div class="modal" id="modal">
+        <div class="modal-header">
+          <button data-close-button class="close-button">&times;</button>
+        </div>
+        <div class="modal-body">
+          Your queries have been submitted, please wait
+        </div>
+      </div>
+      <!-- a modal to inform the user he has submitted something -->
+
+      <!-- file upload -->
+      <br /><br /><br />
+      <h5>OR</h5>
+      <h5>You could sumbit multiple queries by one input file:</h5>
+      <p>
+        (1). Specify your query line by line, each line represents one query,
+        and terminating a query by semicolon(;)
+      </p>
+      <p>(2). Put them into one file, name the file as query.txt</p>
+      <p>
+        <a href="/files/XXX-DDMMYYYY-MTS-query.txt" download>
+          <font color="blue"> txt sample file</font></a
+        >
+      </p>
+      <p>(3). Upload and sumbit it at the box below</p>
+
+      <input id="queryFile" type="file" multiple />
+      <br />
+      <button id="fileSubmit" type="submit" data-modal-target="#modal">
+        submit your file
+      </button>
+      <!-- file upload -->
+
+      <!-- result area    -->
+      <div id="result">
+        <div id="pending-result">
+          <h3>Processing</h3>
+          <ul id="pending"></ul>
+        </div>
+
+        <div id="completed-result">
+          <h3>Completed result</h3>
+          <ul id="completed"></ul>
+        </div>
+      </div>
+      <!-- result area    -->
+
+      <!-- log out button  -->
+      <footer>
+        <div id="logout-form">
+          <form action="/logout?_method=DELETE" method="post">
+            <button type="submit" class="logout">logout</button>
+          </form>
+          <p>placeholders for copyright, company name, etc.</p>
+        </div>
+      </footer>
+      <!-- log out button  -->
+    </div>
+    <!-- input area: text or file upload -->
+
+    <!-- visual effect -->
+    <div id="overlay"></div>
   </body>
 </html>

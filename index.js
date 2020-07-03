@@ -129,23 +129,15 @@ function checkAuthenticated(req, res, next) {
   res.redirect("/login");
 }
 
-//socket.io part
 app.get("/input", checkAuthenticated, (req, res) => {
   //display the uid
   var uid = req.user.uid;
 
   res.render("query", { uid });
 });
-app.post("/input", (req, res) => {
-  //user id
-  // if (uid != 0) uid = req.user.uid;
-  // console.log("aaa", uid);
-  // console.log("aaa", socket.id);
-});
+app.post("/input", (req, res) => {});
 
 let fs = require("fs");
-// const { json } = require("body-parser");
-// const { isDate } = require("util");
 var isEmpty = 0;
 
 var oldSet = [];
@@ -166,8 +158,9 @@ function ReadandSet() {
   }
 }
 function writetoOutputFile(data) {
-  //write to file
-  fs.writeFile("output.json", data, function (err) {
+  //write to output file
+  let path = "output/output_" + Date.now() + ".json";
+  fs.writeFile(path, data, function (err) {
     if (err) {
       console.log(err);
     }
@@ -182,7 +175,7 @@ var isAlpha = function (ch) {
 };
 io.on("connection", (socket) => {
   console.log("connected");
-  //receive file and write it to a txt
+  //receive file and write it upload folder
   socket.on("send-file", (data) => {
     var file = data.file;
     var path = "upload/" + data.filename;
@@ -192,7 +185,7 @@ io.on("connection", (socket) => {
       }
     });
   });
-
+  // dealing with text input
   socket.on("send-chat-message", async (data) => {
     let uid = data.uid;
     var message = data.message;
@@ -209,7 +202,7 @@ io.on("connection", (socket) => {
       //how many queries have been separated by ;
       sentence = 0;
 
-    //store the queries in an array
+    //parse the input and store the queries in an array
     while (i < message.length) {
       //skip contiguous spaces
       if (message.charAt(i) == " " && !isAlpha(message.charAt(i + 1))) {
@@ -396,6 +389,7 @@ io.on("connection", (socket) => {
       }
     });
     if (flag2 == 0) {
+      //pop up an alert
       socket.emit("keysCheck", {
         index: index,
         result: 0,
@@ -407,7 +401,7 @@ io.on("connection", (socket) => {
   }
 });
 
-//write to the final output file
+//gnerate the final output file
 var loop = setInterval(function () {
   console.log(`start ${Date.now()}`);
   //if they are empty
@@ -436,19 +430,19 @@ var loop = setInterval(function () {
 
   while (checkUpload.length > 0 || checkBuffer.length > 0) {
     fileSize = JSON.stringify(Array.from(output)).length;
-    console.log("current output file size" + fileSize);
+    console.log("current output file size " + fileSize);
     //now we have the max queries, write them to the output file
     if (fileSize >= 850000) {
       console.log("Reach maximum size for output file");
       break;
     }
+    //get the first element from each sources
     let oldestFile = checkUpload[0],
       oldestBuffer = checkBuffer[0];
 
     //time2 holds time stamp of the first uploaded file
-
     var time2 = "",
-      uid = 0;
+      userID = "";
 
     //get the oldest buffer submission
     if (checkBuffer.length > 0) {
@@ -523,9 +517,15 @@ var loop = setInterval(function () {
         console.log(e);
       }
       //parse uid and time from the file name. UID and time stamp are separated by _
-      let i = 2;
-      uid = oldestFile[0];
-      //compose time stamp, starting from index 2, since we have read the uid the skipped _
+      let i = 0;
+
+      while (oldestFile[i] != "_") {
+        userID += oldestFile[i];
+        i++;
+      }
+      userID = Number(userID);
+      //compose time stamp, starting from index +1,in order to skip "_"
+      i++;
       while (i < oldestFile.length) {
         time2 += oldestFile[i];
         i++;
@@ -535,7 +535,6 @@ var loop = setInterval(function () {
           break;
         }
       }
-
       //delete the file after we read all the content
       fs.unlink(path, (err) => {
         if (err) console.log(err);
@@ -550,7 +549,7 @@ var loop = setInterval(function () {
         queries: filequery,
       };
       let temp = {
-        id: uid,
+        id: userID,
         queryInformation: queryInformation,
       };
       output.push(temp);
@@ -567,7 +566,6 @@ var loop = setInterval(function () {
     //if the file is older, push that first
     else if (time1 > time2) {
       console.log("time1");
-
       //construct output format for the file
       let queryInformation = {
         time: time2,
@@ -575,7 +573,7 @@ var loop = setInterval(function () {
         queries: filequery,
       };
       let temp = {
-        id: uid,
+        id: userID,
         queryInformation: queryInformation,
       };
       output.push(temp);
@@ -595,7 +593,7 @@ var loop = setInterval(function () {
         queries: filequery,
       };
       let temp = {
-        id: uid,
+        id: userID,
         queryInformation: queryInformation,
       };
       output.push(oldestBuffer);
@@ -625,28 +623,35 @@ var loop = setInterval(function () {
     /************************************************************** */
 
     console.log(`end ${Date.now()}`);
-    console.log("break from loop");
-    clearInterval(loop);
+    // clearInterval(loop);
   }
 
   //after transfering buffer and uploaded file
   //now we gonna deal with queries.json which is the text input
   else {
     //since we put the 1M litmit on queries.json
-    //we can simply move the data in queries.json to outputfile
-    fs.copyFileSync("queries.json", "output.json");
-    //clear queries.json
-    fs.writeFile("queries.json", "", function (err) {
-      if (err) console.log(err);
-    });
+    //we can simply move the data in queries.json to outputfile if queries.json is not empty
+    //now check if it is empty
+    let stats = fs.statSync("queries.json");
+    let fileSizeInBytes = stats["size"];
+    console.log(fileSizeInBytes);
+    if (fileSizeInBytes != 0) {
+      let path = "output/output_" + Date.now() + ".json";
+      fs.copyFileSync("queries.json", path);
+      //clear queries.json
+      fs.writeFile("queries.json", "", function (err) {
+        if (err) console.log(err);
+      });
+    }
+
     /************************************************************** */
     //here we should call the accelerator and empty the output file
     //so that we can repeat the process, for now, just stop the loop
     /************************************************************** */
     console.log(`finish transfering ${Date.now()}`);
-    clearInterval(loop);
+    //clearInterval(loop);
   }
-}, 10000);
+}, 15000);
 
 function writetoFile2(data) {
   //write to the buffer when queries.json is full
