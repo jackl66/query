@@ -628,29 +628,27 @@ var loop = setInterval(function () {
 
   //after transfering buffer and uploaded file
   //now we gonna deal with queries.json which is the text input
-  else {
-    //since we put the 1M litmit on queries.json
-    //we can simply move the data in queries.json to outputfile if queries.json is not empty
-    //now check if it is empty
-    let stats = fs.statSync("queries.json");
-    let fileSizeInBytes = stats["size"];
-    console.log(fileSizeInBytes);
-    if (fileSizeInBytes != 0) {
-      let path = "output/output_" + Date.now() + ".json";
-      fs.copyFileSync("queries.json", path);
-      //clear queries.json
-      fs.writeFile("queries.json", "", function (err) {
-        if (err) console.log(err);
-      });
-    }
-
-    /************************************************************** */
-    //here we should call the accelerator and empty the output file
-    //so that we can repeat the process, for now, just stop the loop
-    /************************************************************** */
-    console.log(`finish transfering ${Date.now()}`);
-    //clearInterval(loop);
+  //since we put the 1M litmit on queries.json
+  //we can simply move the data in queries.json to outputfile if queries.json is not empty
+  //now check if it is empty
+  let stats = fs.statSync("queries.json");
+  let fileSizeInBytes = stats["size"];
+  console.log(fileSizeInBytes);
+  if (fileSizeInBytes != 0) {
+    let path = "output/output_" + Date.now() + ".json";
+    fs.copyFileSync("queries.json", path);
+    //clear queries.json
+    fs.writeFile("queries.json", "", function (err) {
+      if (err) console.log(err);
+    });
   }
+
+  /************************************************************** */
+  //here we should call the accelerator and empty the output file
+  //so that we can repeat the process, for now, just stop the loop
+  /************************************************************** */
+  console.log(`finish transfering ${Date.now()}`);
+  //clearInterval(loop);
 }, 15000);
 
 function writetoFile2(data) {
