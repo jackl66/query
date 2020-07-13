@@ -1,5 +1,9 @@
-//this file handles all the file transfer
+/**************************************************/
+/*****this file handles all the file transfer******/
+/**************************************************/
+
 let fs = require("fs");
+
 //write to output file
 function writetoOutputFile(data) {
   let path = "output/output_" + Date.now() + ".json";
@@ -41,6 +45,7 @@ function writeToupload(data) {
     }
   });
 }
+
 //read file from the given path
 function read(path) {
   var data = fs.readFileSync(path, "utf-8");
@@ -64,11 +69,13 @@ function CopyToOutput(path) {
   fs.copyFileSync("./input/text/queries.json", path);
 }
 
+//delete the file
 function unlink(path) {
   fs.unlink(path, (err) => {
     if (err) console.log(err);
   });
 }
+
 //export functions
 module.exports = {
   writeTobuffer,

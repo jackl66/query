@@ -1,18 +1,20 @@
-const LocalStrategy = require("passport-local").Strategy;
+/**************************************************/
+/*****     this file set up passport         ******/
+/**************************************************/
 
+const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 
+//connect to db
 const { Client } = require("pg");
-
-const client = new Client({
-  database: "web",
-  user: "postgres",
-  password: "15372689740.Li", //your password
-  host: "localhost", //your host name *name of your machine)
-  port: 5432,
-});
-
-client.connect();
+const user = require("../controllers/dbconnect");
+const client = new Client(user);
+client
+  .connect()
+  .then(() => console.log("connected to the database"))
+  .catch((err) => {
+    console.log(err);
+  });
 
 module.exports = function (passport) {
   const authenticateUser = (email, password, done) => {

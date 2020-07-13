@@ -1,3 +1,7 @@
+/**************************************************/
+/***** this file handles socket.io connection *****/
+/**************************************************/
+
 var socket = require("socket.io");
 const io = socket(5000);
 const File = require("./File");

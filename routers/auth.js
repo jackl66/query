@@ -1,10 +1,14 @@
+/**************************************************/
+/*****    this file handles all the routes   ******/
+/**************************************************/
+
 const express = require("express");
 const app = express();
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const bodyParser = require("body-parser");
 
+const bodyParser = require("body-parser");
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
   bodyParser.urlencoded({
@@ -15,21 +19,25 @@ app.use(
 );
 app.use(express.urlencoded({ extended: false }));
 
+//connect to db
 const { Client } = require("pg");
-const client = new Client({
-  database: "web",
-  user: "postgres",
-  password: "15372689740.Li", //your password
-  host: "localhost", //your host name *name of your machine)
-  port: 5432,
-});
-client.connect();
+const user = require("../controllers/dbconnect");
+const client = new Client(user);
+client
+  .connect()
+  .then(() => console.log("connected to the database"))
+  .catch((err) => {
+    console.log(err);
+  });
+
 //render home page
 router.get("/", checkAuthenticated, (req, res) => res.render("login"));
+
 //render login page
 router.get("/login", (req, res) => {
   res.render("login.ejs");
 });
+
 //login post request
 router.post(
   "/login",
@@ -39,10 +47,12 @@ router.post(
     failureFlash: true,
   })
 );
+
 //render register page
 router.get("/register", (req, res) => {
   res.render("register.ejs");
 });
+
 //register post request
 router.post("/register", async (req, res) => {
   let { name, email, password, password2 } = req.body;
@@ -94,6 +104,7 @@ router.delete("/logout", (req, res) => {
   req.logOut();
   res.redirect("/login");
 });
+
 //check if the user has login
 //otherwise, redirect to login page
 function checkAuthenticated(req, res, next) {

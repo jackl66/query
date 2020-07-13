@@ -1,3 +1,6 @@
+/**************************************************/
+/*****   this file generate output file      ******/
+/**************************************************/
 const File = require("./File");
 
 function OutputGenerator() {

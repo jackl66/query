@@ -1,39 +1,6 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const methodOverride = require("method-override");
-app.use(methodOverride("_method"));
-
-/************user system ****************/
-const session = require("express-session");
-const flash = require("express-flash");
-const passport = require("passport");
-require("./controllers/passportConfig")(passport);
-const bcrypt = require("bcrypt");
-app.use(flash());
-app.use(
-  session({
-    secret: "guns,lots of guns",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-/************user system ****************/
-
-//connnect to the database
-const { Client } = require("pg");
-const client = new Client({
-  database: "web",
-  user: "postgres",
-  password: "15372689740.Li", //your password
-  host: "localhost", //your host name *name of your machine)
-  port: 5432,
-});
-client.connect();
-
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -45,6 +12,27 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: false }));
+
+/************user system ****************/
+const session = require("express-session");
+const flash = require("express-flash");
+const passport = require("passport");
+require("./controllers/passportConfig")(passport);
+app.use(flash());
+app.use(
+  session({
+    secret: "guns,lots of guns",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+/************user system ****************/
+
+//logout method override
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
 
 //function to generate output file
 const Output = require("./controllers/OutputGenerator");

@@ -1,3 +1,7 @@
+/**************************************************/
+/*****        script file for the html       ******/
+/**************************************************/
+
 var socket = io.connect("http://localhost:5000");
 const messageForm = document.getElementById("send-container");
 const queryInput = document.getElementById("input-query");
