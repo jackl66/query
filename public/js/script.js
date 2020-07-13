@@ -63,6 +63,7 @@ messageForm.addEventListener("submit", (e) => {
     //unique id for each user
     var unix_timestamp = new Date();
     var x = document.getElementById("uid").textContent;
+    x = Number(x);
     //emit the input
     socket.emit("send-chat-message", {
       message: message,
